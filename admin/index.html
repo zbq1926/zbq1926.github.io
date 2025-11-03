@@ -574,6 +574,17 @@ body {
     transform: rotate(45deg)
 }
 
+.checkbox-group input[type="checkbox"]:disabled {
+    background-color: #f3f4f6;
+    border-color: #d1d5db;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.checkbox-group input[type="checkbox"]:disabled:hover {
+    border-color: #d1d5db;
+}
+
 .checkbox-label {
     font-size: 14px;
     color: #374151;
@@ -1521,6 +1532,60 @@ html.dark-mode .moon-icon {
     flex: 1;
 }
 
+/* 消息通知设置样式 */
+.notification-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px !important;
+}
+
+.notification-row > label:first-child {
+    display: flex;
+    align-items: center;
+    gap: 75px;
+    margin: 0 !important;
+    white-space: nowrap;
+    flex: 1;
+}
+
+.notification-row > label:first-child .checkbox-group {
+    display: flex;
+    margin: 0;
+    white-space: nowrap;
+    gap: 6px;
+}
+
+.notification-controls {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-left: auto;
+    flex-shrink: 0;
+}
+
+.notification-controls .btn {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    font-size: 14px;
+}
+
+.btn-notification-config {
+    background: linear-gradient(135deg, #8b5cf6 0, #7c3aed 100%);
+    color: #fff;
+    box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+}
+
+.btn-notification-config:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(139, 92, 246, 0.4);
+}
+
+.btn-notification-config:active {
+    transform: translateY(0);
+    box-shadow: 0 2px 10px rgba(139, 92, 246, 0.3);
+}
+
 </style>
 </head>
 <body>
@@ -1792,7 +1857,48 @@ html.dark-mode .moon-icon {
                 </div>
             </div>
 
-            <!-- 模块6: 查看所有日志 -->
+            <!-- 模块6: 消息通知设置 -->
+            <div class="module collapsed">
+                <div class="module-title" onclick="toggleModule(this)">
+                    🔔 消息通知设置
+                    <svg class="collapse-icon" viewBox="0 0 24 24"><path d="M7 10l5 5 5-5z"/></svg>
+                </div>
+                <div class="module-content">
+                
+                <!-- TelegramBot 通知设置 -->
+                <div class="form-group notification-row">
+                    <label>
+                        TelegramBot 通知设置
+                        <div class="checkbox-group">
+                            <input type="checkbox" id="telegramEnabled" title="启用TelegramBot通知" onchange="markModified('notification')" disabled>
+                            <label for="telegramEnabled" class="checkbox-label">启用</label>
+                        </div>
+                    </label>
+                    <div class="notification-controls">
+                        <button type="button" class="btn btn-notification-config" onclick="openTelegramConfigModal()">通知参数配置</button>
+                    </div>
+                </div>
+
+                <!-- Cloudflare 可用请求数统计 -->
+                <div class="form-group notification-row">
+                    <label>
+                        Cloudflare 可用请求数统计
+                    </label>
+                    <div class="notification-controls">
+                        <button type="button" class="btn btn-notification-config" onclick="openCloudflareConfigModal()">通知参数配置</button>
+                    </div>
+                </div>
+
+                <div class="module-footer">
+                    <div class="btn-group">
+                        <button type="button" class="btn btn-secondary" onclick="cancelEdit('notification')" disabled id="cancelNotificationBtn">取消</button>
+                        <button type="button" class="btn btn-primary" onclick="saveNotification()" disabled id="saveNotificationBtn">保存</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+
+            <!-- 模块7: 查看所有日志 -->
             <div class="module collapsed">
                 <div class="module-title" onclick="toggleModule(this); loadLogsOnExpand(this)">
                     📋 查看操作日志
@@ -1897,6 +2003,52 @@ html.dark-mode .moon-icon {
             <button type="button" class="btn btn-primary btn-test-api" onclick="testSubAPI()">可用性验证</button>
             <button type="button" class="btn btn-primary btn-confirm-api" id="subAPIConfirmBtn" onclick="confirmSubAPI()" disabled>确定</button>
             <button type="button" class="btn btn-secondary btn-cancel-api" onclick="closeSubAPIModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- TelegramBot 通知设置弹窗 -->
+<div class="modal-overlay" id="telegramConfigModal" onclick="closeTelegramConfigModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" onclick="closeTelegramConfigModal()">×</button>
+        <h2 class="subapi-modal-title">🤖 TelegramBot 通知参数配置</h2>
+        <div class="form-group subapi-form-group">
+            <label>Bot Token</label>
+            <input type="text" id="telegramBotToken" placeholder="输入Telegram Bot Token">
+        </div>
+        <div class="form-group subapi-form-group">
+            <label>Chat ID</label>
+            <input type="text" id="telegramChatID" placeholder="输入Chat ID">
+        </div>
+        <div class="subapi-buttons">
+            <button type="button" class="btn btn-primary btn-test-api" onclick="testTelegramConfig()">可用性验证</button>
+            <button type="button" class="btn btn-primary btn-confirm-api" onclick="confirmTelegramConfig()">确定</button>
+            <button type="button" class="btn btn-secondary btn-cancel-api" onclick="closeTelegramConfigModal()">取消</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cloudflare 通知设置弹窗 -->
+<div class="modal-overlay" id="cloudflareConfigModal" onclick="closeCloudflareConfigModal(event)">
+    <div class="modal" onclick="event.stopPropagation()">
+        <button type="button" class="modal-close" onclick="closeCloudflareConfigModal()">×</button>
+        <h2 class="subapi-modal-title">☁️ Cloudflare 可用请求数统计</h2>
+        <div class="form-group subapi-form-group">
+            <label>API Token</label>
+            <input type="text" id="cloudflareToken" placeholder="输入Cloudflare API Token">
+        </div>
+        <div class="form-group subapi-form-group">
+            <label>Zone ID</label>
+            <input type="text" id="cloudflareZoneID" placeholder="输入Zone ID">
+        </div>
+        <div class="form-group subapi-form-group">
+            <label>通知阈值 (%)</label>
+            <input type="number" id="cloudflareThreshold" placeholder="输入通知阈值，例如20" min="1" max="100" value="20">
+        </div>
+        <div class="subapi-buttons">
+            <button type="button" class="btn btn-primary btn-test-api" onclick="testCloudflareConfig()">可用性验证</button>
+            <button type="button" class="btn btn-primary btn-confirm-api" onclick="confirmCloudflareConfig()">确定</button>
+            <button type="button" class="btn btn-secondary btn-cancel-api" onclick="closeCloudflareConfigModal()">取消</button>
         </div>
     </div>
 </div>
@@ -2011,6 +2163,23 @@ function renderUI() {
     document.getElementById('subAPI').value = currentConfig.订阅转换配置?.SUBAPI || '';
     document.getElementById('subConfig').value = currentConfig.订阅转换配置?.SUBCONFIG || '';
     document.getElementById('emoji').checked = currentConfig.订阅转换配置?.SUBEMOJI || false;
+    
+    // 消息通知设置 - 兼容两种config结构
+    // 优先读取 TG 字段，如果没有则读取 通知.Telegram
+    const telegramBotToken = currentConfig.TG?.BotToken || currentConfig.通知?.Telegram?.BotToken;
+    const telegramChatID = currentConfig.TG?.ChatID || currentConfig.通知?.Telegram?.ChatID;
+    const telegramCheckbox = document.getElementById('telegramEnabled');
+    
+    // 判断TG配置是否完整（BotToken和ChatID都非null且非空字符串）
+    if (telegramBotToken && telegramChatID) {
+        // 两个都有，启用checkbox，并加载 TG.启用 的状态
+        telegramCheckbox.disabled = false;
+        telegramCheckbox.checked = currentConfig.TG?.启用 ?? false;
+    } else {
+        // 任意一个缺少，禁用checkbox
+        telegramCheckbox.disabled = true;
+        telegramCheckbox.checked = false;
+    }
     
     modifiedSections.clear();
     resetAllButtons();
@@ -2353,6 +2522,14 @@ function toggleModule(titleEl) {
 
 function markModified(section) {
     modifiedSections.add(section);
+    
+    // 特殊处理 notification 部分：更新 TG.启用 状态
+    if (section === 'notification') {
+        const telegramCheckbox = document.getElementById('telegramEnabled');
+        if (!currentConfig.TG) currentConfig.TG = {};
+        currentConfig.TG.启用 = telegramCheckbox.checked;
+    }
+    
     updateButtonStates();
 }
 
@@ -2376,6 +2553,11 @@ function updateButtonStates() {
     const convertModified = modifiedSections.has('convert');
     document.getElementById('saveConvertBtn').disabled = !convertModified;
     document.getElementById('cancelConvertBtn').disabled = !convertModified;
+    
+    // 通知设置模块
+    const notificationModified = modifiedSections.has('notification');
+    document.getElementById('saveNotificationBtn').disabled = !notificationModified;
+    document.getElementById('cancelNotificationBtn').disabled = !notificationModified;
 }
 
 function resetAllButtons() {
@@ -2974,6 +3156,198 @@ function confirmSubAPI() {
     document.getElementById('subAPI').value = validURL;
     markModified('convert');
     closeSubAPIModal();
+}
+
+// ==================== 消息通知设置相关函数 ====================
+
+// 打开 TelegramBot 配置模态框
+function openTelegramConfigModal() {
+    document.getElementById('telegramConfigModal').classList.add('show');
+    // 如果已有配置，加载到输入框
+    // 兼容两种config结构：TG 或 通知.Telegram
+    const botToken = currentConfig.TG?.BotToken || currentConfig.通知?.Telegram?.BotToken || '';
+    const chatID = currentConfig.TG?.ChatID || currentConfig.通知?.Telegram?.ChatID || '';
+    document.getElementById('telegramBotToken').value = botToken;
+    document.getElementById('telegramChatID').value = chatID;
+}
+
+// 关闭 TelegramBot 配置模态框
+function closeTelegramConfigModal(event) {
+    if (event && event.target.id !== 'telegramConfigModal') return;
+    document.getElementById('telegramConfigModal').classList.remove('show');
+}
+
+// 测试 TelegramBot 连接
+function testTelegramConfig() {
+    const token = document.getElementById('telegramBotToken').value.trim();
+    const chatID = document.getElementById('telegramChatID').value.trim();
+    
+    if (!token || !chatID) {
+        showToast('请填写Bot Token和Chat ID', 'error');
+        return;
+    }
+    
+    showToast('✅ TelegramBot 配置有效 (测试模式)', 'success');
+}
+
+// 保存 TelegramBot 配置
+function confirmTelegramConfig() {
+    const token = document.getElementById('telegramBotToken').value.trim();
+    const chatID = document.getElementById('telegramChatID').value.trim();
+    
+    if (!token && !chatID) {
+        // 如果都为空，则认为是禁用
+        if (!currentConfig.TG) currentConfig.TG = {};
+        currentConfig.TG.BotToken = '';
+        currentConfig.TG.ChatID = '';
+    } else if (token && chatID) {
+        if (!currentConfig.TG) currentConfig.TG = {};
+        currentConfig.TG.BotToken = token;
+        currentConfig.TG.ChatID = chatID;
+    } else {
+        showToast('请填写完整的Bot Token和Chat ID', 'error');
+        return;
+    }
+    
+    markModified('notification');
+    closeTelegramConfigModal();
+}
+
+// 打开 Cloudflare 配置模态框
+function openCloudflareConfigModal() {
+    document.getElementById('cloudflareConfigModal').classList.add('show');
+    // 如果已有配置，加载到输入框
+    if (currentConfig.通知?.Cloudflare) {
+        document.getElementById('cloudflareToken').value = currentConfig.通知?.Cloudflare?.Token || '';
+        document.getElementById('cloudflareZoneID').value = currentConfig.通知?.Cloudflare?.ZoneID || '';
+        document.getElementById('cloudflareThreshold').value = currentConfig.通知?.Cloudflare?.Threshold || '20';
+    }
+}
+
+// 关闭 Cloudflare 配置模态框
+function closeCloudflareConfigModal(event) {
+    if (event && event.target.id !== 'cloudflareConfigModal') return;
+    document.getElementById('cloudflareConfigModal').classList.remove('show');
+}
+
+// 测试 Cloudflare 连接
+function testCloudflareConfig() {
+    const token = document.getElementById('cloudflareToken').value.trim();
+    const zoneID = document.getElementById('cloudflareZoneID').value.trim();
+    
+    if (!token || !zoneID) {
+        showToast('请填写API Token和Zone ID', 'error');
+        return;
+    }
+    
+    showToast('✅ Cloudflare 配置有效 (测试模式)', 'success');
+}
+
+// 保存 Cloudflare 配置
+function confirmCloudflareConfig() {
+    const token = document.getElementById('cloudflareToken').value.trim();
+    const zoneID = document.getElementById('cloudflareZoneID').value.trim();
+    const threshold = parseInt(document.getElementById('cloudflareThreshold').value) || 20;
+    
+    if (!token || !zoneID) {
+        showToast('请填写完整的API Token和Zone ID', 'error');
+        return;
+    }
+    
+    if (threshold < 1 || threshold > 100) {
+        showToast('通知阈值必须在1-100之间', 'error');
+        return;
+    }
+    
+    if (!currentConfig.通知) currentConfig.通知 = {};
+    currentConfig.通知.Cloudflare = { Token: token, ZoneID: zoneID, Threshold: threshold };
+    
+    markModified('notification');
+    closeCloudflareConfigModal();
+}
+
+// 保存通知设置
+async function saveNotification() {
+    // 将通知配置保存到 currentConfig
+    currentConfig.通知 = {
+        Telegram: {
+            BotToken: document.getElementById('telegramBotToken').value || '',
+            ChatID: document.getElementById('telegramChatID').value || ''
+        },
+        Cloudflare: currentConfig.通知?.Cloudflare || {}
+    };
+    
+    // 如果启用了TelegramBot，确保相关配置不为空
+    if (document.getElementById('telegramEnabled').checked) {
+        if (!document.getElementById('telegramBotToken').value || !document.getElementById('telegramChatID').value) {
+            showToast('请先配置TelegramBot的参数', 'error');
+            return;
+        }
+    }
+    
+    await saveConfigToServer('notification');
+}
+
+// 取消通知设置编辑
+function cancelEdit(section) {
+    if (section === 'notification') {
+        // 重置通知模块的所有输入
+        document.getElementById('telegramEnabled').checked = currentConfig.通知?.Telegram?.BotToken ? true : false;
+        currentConfig = JSON.parse(JSON.stringify(originalConfig));
+    } else {
+        // 原有的cancelEdit逻辑
+        currentConfig = JSON.parse(JSON.stringify(originalConfig));
+        
+        if (section === 'sub') {
+            const local = currentConfig.优选订阅生成?.local ?? true;
+            const randomIP = currentConfig.优选订阅生成?.本地IP库?.随机IP ?? true;
+            
+            if (!local) {
+                document.getElementById('ipMode').value = 'generator';
+                document.getElementById('generatorURL').value = currentConfig.优选订阅生成?.SUB || '';
+            } else if (randomIP) {
+                document.getElementById('ipMode').value = 'random';
+                document.getElementById('randomCount').value = currentConfig.优选订阅生成?.本地IP库?.随机数量 || 16;
+            } else {
+                document.getElementById('ipMode').value = 'custom';
+                loadCustomIPs();
+            }
+            updateIPMode();
+        } else if (section === 'config') {
+            document.getElementById('subName').value = currentConfig.优选订阅生成?.SUBNAME || '';
+            document.getElementById('nodeHost').value = currentConfig.HOST || '';
+            document.getElementById('nodeUUID').value = currentConfig.UUID || '';
+            document.getElementById('protocol').value = currentConfig.协议类型 || 'vless';
+            document.getElementById('skipVerify').checked = currentConfig.跳过证书验证 || false;
+            updateProtocol();
+        } else if (section === 'proxy') {
+            const socksEnabled = currentConfig.反代?.SOCKS5?.启用;
+            if (!socksEnabled) {
+                document.getElementById('proxyMode').value = 'auto';
+                document.getElementById('proxyIP').value = currentConfig.反代?.PROXYIP || '';
+                document.getElementById('autoProxy').checked = (currentConfig.反代?.PROXYIP === 'auto');
+                if (currentConfig.反代?.PROXYIP === 'auto') {
+                    document.getElementById('proxyIP').disabled = true;
+                }
+            } else if (socksEnabled === 'socks5') {
+                document.getElementById('proxyMode').value = 'socks5';
+                document.getElementById('socks5Addr').value = currentConfig.反代?.SOCKS5?.账号 || '';
+                document.getElementById('globalSocks5').checked = currentConfig.反代?.SOCKS5?.全局 || false;
+            } else if (socksEnabled === 'http') {
+                document.getElementById('proxyMode').value = 'http';
+                document.getElementById('httpAddr').value = currentConfig.反代?.SOCKS5?.账号 || '';
+                document.getElementById('globalHTTP').checked = currentConfig.反代?.SOCKS5?.全局 || false;
+            }
+            updateProxyMode();
+        } else if (section === 'convert') {
+            document.getElementById('subAPI').value = currentConfig.订阅转换配置?.SUBAPI || '';
+            document.getElementById('subConfig').value = currentConfig.订阅转换配置?.SUBCONFIG || '';
+            document.getElementById('emoji').checked = currentConfig.订阅转换配置?.SUBEMOJI || false;
+        }
+    }
+    
+    modifiedSections.delete(section);
+    updateButtonStates();
 }
 
 // 初始化

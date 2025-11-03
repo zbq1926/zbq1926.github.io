@@ -1708,7 +1708,7 @@ html.dark-mode .moon-icon {
                     <div class="form-group">
                         <label for="proxyIP">PROXYIP</label>
                         <div class="input-wrapper">
-                            <input type="text" id="proxyIP" title="PROXYIP" placeholder="示例: proxyip.cmliussss.net" onchange="markModified('proxy')">
+                            <input type="text" id="proxyIP" title="PROXYIP" placeholder="proxyip.cmliussss.net" onchange="markModified('proxy')">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="autoProxy" title="启用自动获取" onchange="toggleAutoProxy(); markModified('proxy')">
                                 <label for="autoProxy" class="checkbox-label">启用自动获取</label>
@@ -1722,7 +1722,7 @@ html.dark-mode .moon-icon {
                     <div class="form-group">
                         <label for="socks5Addr">SOCKS5</label>
                         <div class="input-wrapper">
-                        <input type="text" id="socks5Addr" title="SOCKS5" placeholder="示例: user:password@127.0.0.1:1080" onchange="markModified('proxy')">
+                        <input type="text" id="socks5Addr" title="SOCKS5" placeholder="user:password@127.0.0.1:1080" onchange="markModified('proxy')">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="globalSocks5" title="启用全局代理" onchange="markModified('proxy')">
                                 <label for="globalSocks5" class="checkbox-label">启用全局代理</label>
@@ -1735,7 +1735,7 @@ html.dark-mode .moon-icon {
                     <div class="form-group">
                         <label for="httpAddr">HTTP</label>
                         <div class="input-wrapper">
-                        <input type="text" id="httpAddr" title="HTTP" placeholder="示例: user:password@127.0.0.1:1080" onchange="markModified('proxy')">
+                        <input type="text" id="httpAddr" title="HTTP" placeholder="user:password@127.0.0.1:1080" onchange="markModified('proxy')">
                             <div class="checkbox-group">
                                 <input type="checkbox" id="globalHTTP" title="启用全局代理" onchange="markModified('proxy')">
                                 <label for="globalHTTP" class="checkbox-label">启用全局代理</label>
@@ -2348,17 +2348,34 @@ async function saveProxy() {
     let globalProxy = false;
     let proxyIP = currentConfig.反代.PROXYIP;
     
+    // 检查文本框内容是否为空
     if (mode === 'auto') {
         socksEnabled = null;
-        proxyIP = document.getElementById('autoProxy').checked ? 'auto' : document.getElementById('proxyIP').value;
+        const autoProxy = document.getElementById('autoProxy').checked;
+        proxyIP = autoProxy ? 'auto' : document.getElementById('proxyIP').value.trim();
+        
+        if (!autoProxy && !proxyIP) {
+            showToast('PROXYIP地址不能为空', 'error');
+            return;
+        }
     } else if (mode === 'socks5') {
         socksEnabled = 'socks5';
-        socksAccount = document.getElementById('socks5Addr').value;
+        socksAccount = document.getElementById('socks5Addr').value.trim();
         globalProxy = document.getElementById('globalSocks5').checked;
+        
+        if (!socksAccount) {
+            showToast('SOCKS5地址不能为空', 'error');
+            return;
+        }
     } else if (mode === 'http') {
         socksEnabled = 'http';
-        socksAccount = document.getElementById('httpAddr').value;
+        socksAccount = document.getElementById('httpAddr').value.trim();
         globalProxy = document.getElementById('globalHTTP').checked;
+        
+        if (!socksAccount) {
+            showToast('HTTP地址不能为空', 'error');
+            return;
+        }
     }
     
     currentConfig.反代 = {

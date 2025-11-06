@@ -1240,7 +1240,11 @@
         }
 
         .readonly-wrapper {
-            position: relative
+            position: relative;
+        }
+
+        .proxy-input-wrapper {
+            flex: 1;
         }
 
         .readonly-wrapper input[readonly] {
@@ -1248,6 +1252,7 @@
             background-color: #fff !important;
             border: 2px solid #e5e7eb !important;
             color: #1f2937 !important;
+            width: 100%;
         }
 
         .readonly-wrapper input[readonly]:hover {
@@ -2714,7 +2719,7 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            z-index: 10000;
+            z-index: 2000000001;
             padding: 20px;
             overflow-y: auto;
         }
@@ -3487,9 +3492,10 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                         <div class="form-group">
                             <label for="socks5Addr">SOCKS5</label>
                             <div class="input-wrapper">
-                                <input type="text" id="socks5Addr" title="SOCKS5"
-                                    placeholder="user:password@127.0.0.1:1080" onchange="processProxyAddress('socks5')"
-                                    oninput="processProxyAddress('socks5')">
+                                <div class="readonly-wrapper proxy-input-wrapper" onclick="openProxyVerificationModal('socks5')">
+                                    <input type="text" id="socks5Addr" title="SOCKS5"
+                                        placeholder="user:password@127.0.0.1:1080" readonly class="subapi-input">
+                                </div>
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="globalSocks5" title="启用全局代理"
                                         onchange="markModified('proxy')">
@@ -3503,8 +3509,10 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                         <div class="form-group">
                             <label for="httpAddr">HTTP</label>
                             <div class="input-wrapper">
-                                <input type="text" id="httpAddr" title="HTTP" placeholder="user:password@127.0.0.1:8080"
-                                    onchange="processProxyAddress('http')" oninput="processProxyAddress('http')">
+                                <div class="readonly-wrapper proxy-input-wrapper" onclick="openProxyVerificationModal('http')">
+                                    <input type="text" id="httpAddr" title="HTTP" placeholder="user:password@127.0.0.1:8080"
+                                        readonly class="subapi-input">
+                                </div>
                                 <div class="checkbox-group">
                                     <input type="checkbox" id="globalHTTP" title="启用全局代理"
                                         onchange="markModified('proxy')">
@@ -3963,6 +3971,36 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
                 <button type="button" class="btn btn-append-results" id="btnAppendResults"
                     onclick="appendResultsToCustom()" disabled>追加结果</button>
                 <button type="button" class="btn btn-close-api" onclick="closeAPIOptimizeModal()">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 代理验证模态框 -->
+    <div class="modal-overlay" id="proxyVerificationModal">
+        <div class="modal" id="proxyVerificationContent" style="min-width: 450px;" onclick="event.stopPropagation()">
+            <button type="button" class="modal-close" onclick="closeProxyVerificationModal()">×</button>
+            
+            <h2 id="proxyVerificationTitle" style="margin-bottom: 20px; font-size: 18px; font-weight: 600; text-align: center;"></h2>
+            
+            <div class="form-group" style="margin-bottom: 20px;">
+                <label id="proxyVerificationLabel" style="display: block; margin-bottom: 10px; font-weight: 600;"></label>
+                <input type="text" id="proxyVerificationInput" placeholder="" style="width: 100%; padding: 12px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px;">
+            </div>
+            
+            <div id="proxyVerificationStatus" style="margin-bottom: 20px; padding: 12px; border-radius: 8px; display: none; font-size: 14px;">
+            </div>
+            
+            <div class="api-buttons" style="display: flex; gap: 10px; justify-content: space-between;">
+                <button type="button" class="btn btn-verify-api" onclick="verifyProxyAvailability()" style="flex: 1;">
+                    可用性验证
+                </button>
+                <button type="button" class="btn btn-append-api" id="proxyConfirmBtn" onclick="confirmProxyAddress()" 
+                    style="flex: 1; opacity: 0.5;" disabled>
+                    确定
+                </button>
+                <button type="button" class="btn btn-close-api" onclick="closeProxyVerificationModal()" style="flex: 1;">
+                    取消
+                </button>
             </div>
         </div>
     </div>
@@ -5167,6 +5205,204 @@ https://raw.githubusercontent.com/cmliu/WorkerVless2sub/main/addressesapi.txt"
         function closeLogsModal(event) {
             if (event && event.target.id !== 'logsModal') return;
             document.getElementById('logsModal').classList.remove('show');
+        }
+
+        // ==================== 代理验证模态框函数 ====================
+        
+        // 全局变量存储当前验证的代理类型
+        let currentProxyType = null;
+        let currentProxyFieldId = null;
+        
+        function openProxyVerificationModal(proxyType) {
+            currentProxyType = proxyType;
+            currentProxyFieldId = proxyType === 'socks5' ? 'socks5Addr' : 'httpAddr';
+            
+            // 设置模态框标题和标签
+            const title = proxyType === 'socks5' ? 'SOCKS5代理验证' : 'HTTP代理验证';
+            const label = proxyType === 'socks5' ? 'SOCKS5代理:' : 'HTTP代理:';
+            
+            document.getElementById('proxyVerificationTitle').textContent = title;
+            document.getElementById('proxyVerificationLabel').textContent = label;
+            document.getElementById('proxyVerificationInput').placeholder = proxyType === 'socks5' 
+                ? 'user:password@127.0.0.1:1080' 
+                : 'user:password@127.0.0.1:8080';
+            
+            // 设置输入框的当前值
+            const currentValue = document.getElementById(currentProxyFieldId).value;
+            document.getElementById('proxyVerificationInput').value = currentValue;
+            
+            // 重置状态
+            document.getElementById('proxyVerificationStatus').style.display = 'none';
+            document.getElementById('proxyVerificationStatus').textContent = '';
+            document.getElementById('proxyConfirmBtn').disabled = true;
+            document.getElementById('proxyConfirmBtn').style.opacity = '0.5';
+            
+            // 显示模态框
+            document.getElementById('proxyVerificationModal').classList.add('show');
+        }
+        
+        function closeProxyVerificationModal(event) {
+            document.getElementById('proxyVerificationModal').classList.remove('show');
+            currentProxyType = null;
+            currentProxyFieldId = null;
+            document.getElementById('proxyVerificationInput').value = '';
+            document.getElementById('proxyVerificationStatus').style.display = 'none';
+        }
+        
+        async function verifyProxyAvailability() {
+            const input = document.getElementById('proxyVerificationInput').value.trim();
+            if (!input) {
+                showProxyVerificationStatus('请输入代理地址', 'error');
+                return;
+            }
+            
+            // 预处理代理地址
+            const processedAddress = processProxyAddressForValidation(input, currentProxyType);
+            if (!processedAddress) {
+                showProxyVerificationStatus('代理地址格式无效', 'error');
+                return;
+            }
+            
+            const statusEl = document.getElementById('proxyVerificationStatus');
+            const verifyBtn = document.querySelector('#proxyVerificationModal .btn-verify-api');
+            
+            try {
+                verifyBtn.disabled = true;
+                statusEl.textContent = '⏳ 验证中...';
+                statusEl.style.display = 'block';
+                statusEl.style.background = 'linear-gradient(135deg, #3b82f6 0, #1d4ed8 100%)';
+                statusEl.style.color = '#fff';
+                statusEl.style.padding = '16px';
+                statusEl.style.borderRadius = '8px';
+                
+                // 构建请求参数
+                const params = new URLSearchParams();
+                if (currentProxyType === 'socks5') {
+                    params.append('socks5', processedAddress);
+                } else {
+                    params.append('http', processedAddress);
+                }
+                
+                const response = await fetch(`/admin/check?${params}`, {
+                    method: 'GET'
+                });
+                
+                const data = await response.json();
+                
+                // 检查是否有 success 字段
+                if (!data.hasOwnProperty('success')) {
+                    statusEl.style.background = 'linear-gradient(135deg, #ef4444 0, #dc2626 100%)';
+                    statusEl.style.padding = '16px';
+                    statusEl.style.borderRadius = '8px';
+                    statusEl.innerHTML = '❌ <strong>后端版本过旧</strong><br/><small style="opacity: 0.9;">请升级 edgetunnel 代码</small>';
+                    document.getElementById('proxyConfirmBtn').disabled = true;
+                    document.getElementById('proxyConfirmBtn').style.opacity = '0.5';
+                } else if (data.success === false) {
+                    statusEl.style.background = 'linear-gradient(135deg, #ef4444 0, #dc2626 100%)';
+                    statusEl.style.padding = '16px';
+                    statusEl.style.borderRadius = '8px';
+                    statusEl.innerHTML = `❌ <strong>代理无效</strong><br/><small style="opacity: 0.9;">${data.error || '未知错误'}</small>`;
+                    document.getElementById('proxyConfirmBtn').disabled = true;
+                    document.getElementById('proxyConfirmBtn').style.opacity = '0.5';
+                } else if (data.success === true) {
+                    const ip = data.ip || '未知';
+                    const loc = data.loc || '未知';
+                    
+                    statusEl.style.background = 'linear-gradient(135deg, #10b981 0, #059669 100%)';
+                    statusEl.style.padding = '16px';
+                    statusEl.style.borderRadius = '8px';
+                    statusEl.innerHTML = `
+                        <div style="line-height: 1.8;">
+                            <div style="margin-bottom: 8px;">✅ <strong>代理有效</strong></div>
+                            <div style="margin-bottom: 8px;">📍 落地IP: <span style="cursor: pointer; text-decoration: underline; font-weight: 600; display: inline-flex; align-items: center; gap: 4px;" onclick="showIpDetailForProxy('${ip}')" title="点击查看IP详情">${ip} <span style="font-size: 16px;">🔍</span></span></div>
+                            <div>🌍 落地国家: <strong>${loc}</strong></div>
+                        </div>
+                    `;
+                    
+                    // 启用确定按钮
+                    document.getElementById('proxyConfirmBtn').disabled = false;
+                    document.getElementById('proxyConfirmBtn').style.opacity = '1';
+                    
+                    // 存储验证后的地址以备后用
+                    document.getElementById('proxyConfirmBtn').dataset.validAddress = processedAddress;
+                }
+            } catch (error) {
+                statusEl.style.background = 'linear-gradient(135deg, #ef4444 0, #dc2626 100%)';
+                statusEl.style.padding = '16px';
+                statusEl.style.borderRadius = '8px';
+                statusEl.innerHTML = `❌ <strong>验证失败</strong><br/><small style="opacity: 0.9;">${error.message}</small>`;
+                document.getElementById('proxyConfirmBtn').disabled = true;
+                document.getElementById('proxyConfirmBtn').style.opacity = '0.5';
+            } finally {
+                verifyBtn.disabled = false;
+            }
+        }
+        
+        function processProxyAddressForValidation(input, type) {
+            input = input.trim();
+            
+            // 移除开头的 "/" 或 "/"
+            if (input.startsWith('/')) {
+                input = input.substring(1).trim();
+            }
+            
+            // 检测并移除协议前缀
+            const socks5Prefixes = ['socks5://', 'socks5=', 'socks5://'];
+            const httpPrefixes = ['http://', 'http=', 'https://'];
+            
+            for (const prefix of socks5Prefixes) {
+                if (input.toLowerCase().startsWith(prefix)) {
+                    input = input.substring(prefix.length).trim();
+                    break;
+                }
+            }
+            
+            for (const prefix of httpPrefixes) {
+                if (input.toLowerCase().startsWith(prefix)) {
+                    input = input.substring(prefix.length).trim();
+                    break;
+                }
+            }
+            
+            // 移除末尾的备注（#符号之后的内容）
+            if (input.includes('#')) {
+                input = input.split('#')[0].trim();
+            }
+            
+            return input;
+        }
+        
+        function showProxyVerificationStatus(message, type) {
+            const statusEl = document.getElementById('proxyVerificationStatus');
+            const prefix = type === 'error' ? '❌' : 'ℹ️';
+            statusEl.textContent = prefix + ' ' + message;
+            statusEl.style.display = 'block';
+            if (type === 'error') {
+                statusEl.style.background = 'linear-gradient(135deg, #ef4444 0, #dc2626 100%)';
+            } else {
+                statusEl.style.background = 'linear-gradient(135deg, #3b82f6 0, #1d4ed8 100%)';
+            }
+            statusEl.style.color = '#fff';
+        }
+        
+        function showIpDetailForProxy(ip) {
+            // 异步获取 IP 详情
+            fetch(`https://api.ipapi.cmliussss.net/?ip=${ip}`)
+                .then(response => response.json())
+                .then(data => showIpDetailModal(data))
+                .catch(error => {
+                    showToast('❌ 查询IP详细信息失败');
+                    console.error('IP查询错误:', error);
+                });
+        }
+        
+        function confirmProxyAddress() {
+            const validAddress = document.getElementById('proxyConfirmBtn').dataset.validAddress;
+            if (!validAddress) return;
+            
+            document.getElementById(currentProxyFieldId).value = validAddress;
+            markModified('proxy');
+            closeProxyVerificationModal();
         }
 
         function openSubAPIModal() {

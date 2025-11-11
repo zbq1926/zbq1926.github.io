@@ -3850,7 +3850,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- 日志查看弹窗 -->
-    <div class="modal-overlay" id="logsModal" onclick="closeLogsModal(event)">
+    <div class="modal-overlay" id="logsModal">
         <div class="modal logs-modal" onclick="event.stopPropagation()">
             <button type="button" class="modal-close" onclick="closeLogsModal()">×</button>
             <h2 class="logs-modal-title">📋 所有操作日志</h2>
@@ -3860,7 +3860,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- 订阅转换后端设置弹窗 -->
-    <div class="modal-overlay" id="subAPIModal" onclick="closeSubAPIModal(event)">
+    <div class="modal-overlay" id="subAPIModal">
         <div class="modal" onclick="event.stopPropagation()">
             <button type="button" class="modal-close" onclick="closeSubAPIModal()">×</button>
             <h2 class="subapi-modal-title">⚙️ 订阅转换后端</h2>
@@ -3879,7 +3879,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- TelegramBot 通知设置弹窗 -->
-    <div class="modal-overlay" id="telegramConfigModal" onclick="closeTelegramConfigModal(event)">
+    <div class="modal-overlay" id="telegramConfigModal">
         <div class="modal" onclick="event.stopPropagation()">
             <button type="button" class="modal-close" onclick="closeTelegramConfigModal()">×</button>
             <h2 class="subapi-modal-title">🤖 TelegramBot 通知参数配置</h2>
@@ -3903,7 +3903,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- Cloudflare 通知设置弹窗 -->
-    <div class="modal-overlay" id="cloudflareConfigModal" onclick="closeCloudflareConfigModal(event)">
+    <div class="modal-overlay" id="cloudflareConfigModal">
         <div class="modal" onclick="event.stopPropagation()">
             <button type="button" class="modal-close" onclick="closeCloudflareConfigModal()">×</button>
             <h2 class="subapi-modal-title">☁️ Workers/Pages 可用请求数统计</h2>
@@ -4030,7 +4030,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- API优选模态框 -->
-    <div class="modal-overlay" id="apiOptimizeModal" onclick="closeAPIOptimizeModal(event)">
+    <div class="modal-overlay" id="apiOptimizeModal">
         <div class="modal api-optimize-modal" onclick="event.stopPropagation()">
             <button type="button" class="modal-close" onclick="closeAPIOptimizeModal()">×</button>
             <h2 class="api-optimize-modal-title">🔌 优选API</h2>
@@ -5142,13 +5142,13 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 cardContainer.classList.remove('simple-mode');
                 btn.textContent = '🐣 我是小白！我想简单点！';
                 localStorage.setItem('userMode', 'expert');
-                showToast('已切换到高手模式，显示所有功能', 'success');
+                showToast('🚀 已切换到高手模式，显示所有功能', 'success');
             } else {
                 // 切换到小白模式
                 cardContainer.classList.add('simple-mode');
                 btn.textContent = '🚀 我是高手！我就要折腾！';
                 localStorage.setItem('userMode', 'simple');
-                showToast('已切换到小白模式，只显示常用功能', 'success');
+                showToast('🐣 已切换到小白模式，只显示常用功能', 'success');
             }
             
             // 使用 requestAnimationFrame 确保动画流畅

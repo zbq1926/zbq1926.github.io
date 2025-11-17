@@ -1236,7 +1236,7 @@
             opacity: 0
         }
 
-        .module .form-group {
+        .module .form-group, #portSection {
             margin-bottom: 20px;
             display: grid;
             grid-template-columns: 200px 1fr;
@@ -3478,6 +3478,19 @@
                             onchange="markModified('sub')" oninput="if(this.value>99){this.value=99;}">
                     </div>
 
+                    <div id="portSection" class="form-group hidden-section">
+                        <label for="specifiedPort">指定优选端口</label>
+                        <select id="specifiedPort" onchange="markModified('sub')">
+                            <option value="-1">随机端口</option>
+                            <option value="443">443</option>
+                            <option value="2053">2053</option>
+                            <option value="2083">2083</option>
+                            <option value="2087">2087</option>
+                            <option value="2096">2096</option>
+                            <option value="8443">8443</option>
+                        </select>
+                    </div>
+
                     <div id="customIPSection" class="form-group hidden-section">
                         <label for="customIPs">自定义优选地址</label>
                         <textarea id="customIPs" title="自定义优选地址" placeholder="注意：
@@ -4350,6 +4363,10 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
             } else if (randomIP) {
                 document.getElementById('ipMode').value = 'random';
                 document.getElementById('randomCount').value = currentConfig.优选订阅生成?.本地IP库?.随机数量 || 16;
+                // 设置指定端口
+                if (currentConfig.优选订阅生成?.本地IP库?.指定端口 !== undefined) {
+                    document.getElementById('specifiedPort').value = currentConfig.优选订阅生成.本地IP库.指定端口;
+                }
             } else {
                 document.getElementById('ipMode').value = 'custom';
                 loadCustomIPs();
@@ -4495,6 +4512,13 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
             document.getElementById('randomIPSection').style.display = mode === 'random' ? 'grid' : 'none';
             document.getElementById('customIPSection').style.display = mode === 'custom' ? 'block' : 'none';
             document.getElementById('generatorSection').style.display = mode === 'generator' ? 'grid' : 'none';
+
+            // 显示或隐藏指定端口
+            if (mode === 'random' && currentConfig.优选订阅生成?.本地IP库?.指定端口 !== undefined) {
+                document.getElementById('portSection').style.display = 'grid';
+            } else {
+                document.getElementById('portSection').style.display = 'none';
+            }
 
             // 显示或隐藏在线优选和优选API按钮（仅在自定义优选模式下显示）
             const onlineOptimizeBtn = document.getElementById('onlineOptimizeBtn');
@@ -4934,6 +4958,11 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 TOKEN: currentConfig.优选订阅生成.TOKEN
             };
 
+            // 如果指定端口存在，添加到本地IP库
+            if (currentConfig.优选订阅生成?.本地IP库?.指定端口 !== undefined) {
+                updates.本地IP库.指定端口 = parseInt(document.getElementById('specifiedPort').value);
+            }
+
             currentConfig.优选订阅生成 = { ...currentConfig.优选订阅生成, ...updates };
 
             if (mode === 'custom') {
@@ -5061,6 +5090,10 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 } else if (randomIP) {
                     document.getElementById('ipMode').value = 'random';
                     document.getElementById('randomCount').value = currentConfig.优选订阅生成?.本地IP库?.随机数量 || 16;
+                    // 设置指定端口
+                    if (currentConfig.优选订阅生成?.本地IP库?.指定端口 !== undefined) {
+                        document.getElementById('specifiedPort').value = currentConfig.优选订阅生成.本地IP库.指定端口;
+                    }
                 } else {
                     document.getElementById('ipMode').value = 'custom';
                     loadCustomIPs();

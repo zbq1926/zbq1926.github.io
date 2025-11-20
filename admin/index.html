@@ -5150,11 +5150,11 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 });
 
                 if (!response.ok) throw new Error('保存失败');
-                showToast('配置已保存', 'success');
+                showToast('✅ 配置已保存，请更新订阅，才能获取最新节点内容！', 'success');
                 modifiedSections.delete(section);
                 updateButtonStates();
             } catch (error) {
-                showToast('保存失败: ' + error.message, 'error');
+                showToast('😢 ' + error.message + '，请检测网络环境，或关闭代理后再试！', 'error');
             }
         }
 

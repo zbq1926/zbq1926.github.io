@@ -4361,8 +4361,8 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                     </div>
 
                     <div class="form-group" id="fingerprintGroup">
-                        <label for="fingerprint">浏览器指纹</label>
-                        <select id="fingerprint" title="浏览器指纹" onchange="markModified('config')">
+                        <label for="fingerprint">指纹伪装</label>
+                        <select id="fingerprint" title="浏览器指纹" onchange="handleFingerprintChange(); markModified('config')">
                             <option value="chrome">chrome（支持ECH）</option>
                             <option value="firefox">firefox（支持ECH）</option>
                             <option value="safari">safari</option>
@@ -5643,10 +5643,12 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
             const enableECHGroup = document.getElementById('enableECHGroup');
             const enableECHCheckbox = document.getElementById('enableECH');
             if (currentConfig['ECH'] !== undefined) {
-                enableECHGroup.style.setProperty('display', 'flex', 'important');
+                enableECHGroup.style.display = 'flex';
                 enableECHCheckbox.checked = currentConfig['ECH'] || false;
+                // 根据Fingerprint值初始化ECH选项的禁用状态
+                updateECHOptionState();
             } else {
-                enableECHGroup.style.setProperty('display', 'none', 'important');
+                enableECHGroup.style.display = 'none';
             }
 
             // 反代落地设置
@@ -5907,6 +5909,45 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                 transport.disabled = false;
             }
             */
+        }
+
+        // 处理浏览器指纹变化，联动ECH选项
+        function handleFingerprintChange() {
+            updateECHOptionState();
+        }
+
+        // 更新ECH选项的状态（禁用/启用）
+        function updateECHOptionState() {
+            const fingerprint = document.getElementById('fingerprint').value;
+            const enableECHCheckbox = document.getElementById('enableECH');
+            const enableECHLabel = document.querySelector('label[for="enableECH"]');
+            const enableECHGroup = document.getElementById('enableECHGroup');
+            
+            // 支持ECH的指纹类型
+            const supportECH = ['chrome', 'firefox', 'random'];
+            
+            if (enableECHGroup && enableECHCheckbox) {
+                if (supportECH.includes(fingerprint)) {
+                    // 启用ECH选项
+                    enableECHCheckbox.disabled = false;
+                    enableECHGroup.style.opacity = '1';
+                    enableECHGroup.style.pointerEvents = 'auto';
+                    if (enableECHLabel) {
+                        enableECHLabel.style.opacity = '1';
+                        enableECHLabel.style.cursor = 'pointer';
+                    }
+                } else {
+                    // 禁用ECH选项，取消勾选，变成灰色
+                    enableECHCheckbox.disabled = true;
+                    enableECHCheckbox.checked = false;
+                    enableECHGroup.style.opacity = '0.5';
+                    enableECHGroup.style.pointerEvents = 'none';
+                    if (enableECHLabel) {
+                        enableECHLabel.style.opacity = '0.5';
+                        enableECHLabel.style.cursor = 'not-allowed';
+                    }
+                }
+            }
         }
 
         // 处理PROXYIP地址

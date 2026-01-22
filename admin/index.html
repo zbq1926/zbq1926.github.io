@@ -4492,12 +4492,14 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                         <div class="input-wrapper" style="flex-direction: column; align-items: stretch;">
                             <select id="echDNSSelect" title="ECH DNS服务" style="display: none;" onchange="onEchDNSSelectChange()">
                                 <option value="custom">自定义</option>
-                                <option value="tls://dns.alidns.com">tls://dns.alidns.com（阿里 DoT）</option>
-                                <option value="tls://dot.pub">tls://dot.pub（腾讯 DoT）</option>
-                                <option value="https://sm2.doh.pub/dns-query">https://sm2.doh.pub/dns-query（腾讯国密 DoH）</option>
-                                <option value="https://dns.google/dns-query">https://dns.google/dns-query（Google DoH）</option>
-                                <option value="https://doh.cmliussss.com/CMLiussss">https://doh.cmliussss.com/CMLiussss（Google DoH CM镜像）</option>
-                                <option value="https://doh.cmliussss.net/CMLiussss">https://doh.cmliussss.net/CMLiussss（Cloudflare DoH CM镜像）</option>
+                                <option value="https://dns.alidns.com/dns-query">https://dns.alidns.com/dns-query（阿里云）</option>
+                                <option value="tls://dot.pub">tls://dot.pub（腾讯云）</option>
+                                <option value="https://sm2.doh.pub/dns-query">https://sm2.doh.pub/dns-query（腾讯国密）</option>
+                                <option value="https://dns.google/dns-query">https://dns.google/dns-query（Google）</option>
+                                <option value="https://basic.rethinkdns.com/">https://basic.rethinkdns.com/（RethinkDNS）</option>
+                                <option value="https://v.recipes/dns-query">https://v.recipes/dns-query（V.recipes）</option>
+                                <option value="https://doh.cmliussss.com/CMLiussss">https://doh.cmliussss.com/CMLiussss（Google CM镜像）</option>
+                                <option value="https://doh.cmliussss.net/CMLiussss">https://doh.cmliussss.net/CMLiussss（Cloudflare CM镜像）</option>
                             </select>
                             <input type="text" id="echDNSCustomInput" title="自定义ECH DNS服务" placeholder="tls://... 或 https://..." onchange="onEchDNSCustomInput()" style="display: none; margin-top: 8px;">
                             <input type="hidden" id="echDNSValue">

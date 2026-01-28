@@ -6047,6 +6047,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     <!-- HOSTS 检查提示弹窗 -->
     <div class="modal-overlay" id="hostsMismatchModal" onclick="closeHostsMismatchModal(event)">
         <div class="modal" onclick="event.stopPropagation()" style="max-width: 500px;">
+            <button type="button" class="modal-close" onclick="closeHostsMismatchModal()">×</button>
             <div style="text-align: center; padding: 20px 0;">
                 <h2 style="color: #f44336; margin: 0 0 16px 0; font-size: 22px; font-weight: 700;">⚠️ 域名配置提示</h2>
                 <p style="margin: 0 0 12px 0; font-size: 14px; line-height: 1.6; text-align: left;">
@@ -12375,14 +12376,15 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
 
         // 关闭 HOSTS 不匹配提示模态框
         function closeHostsMismatchModal(event) {
-            // 如果点击的是 overlay 本身（不是内容区域），则关闭
-            if (event && event.target.id !== 'hostsMismatchModal') {
+            // 如果有事件对象且点击的不是 overlay 本身，则返回
+            if (event && event.target && event.target.id !== 'hostsMismatchModal') {
                 return;
             }
             
-            const modal = document.getElementById('hostsMismatchModal');
-            const overlay = modal.parentElement;
-            overlay.classList.remove('show');
+            const overlay = document.getElementById('hostsMismatchModal');
+            if (overlay) {
+                overlay.classList.remove('show');
+            }
         }
 
         // 处理"知道了！24小时内不提示"按钮
@@ -12397,7 +12399,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
             closeHostsMismatchModal({ target: { id: 'hostsMismatchModal' } });
             
             // 显示确认提示
-            showToast('已记录，24小时内不会再提示', 'info');
+            showToast('24小时内不会再提示', 'info');
         }
 
     </script>

@@ -5789,7 +5789,7 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
     </div>
 
     <!-- 获取更多 PROXYIP 弹窗 -->
-    <div class="modal-overlay" id="getMoreProxyIPModal" onclick="closeGetMoreProxyIPModal(event)">
+    <div class="modal-overlay" id="getMoreProxyIPModal">
         <div class="modal" onclick="event.stopPropagation()" style="max-width: 420px; text-align: left;">
             <button type="button" class="modal-close" onclick="closeGetMoreProxyIPModal()">×</button>
             <h2 class="section-title" style="margin-bottom: 15px; text-align: center;">🗺️ 探索更多 PROXYIP</h2>
@@ -5805,33 +5805,33 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
                         <option value="custom">✍️ 自定义地区代码</option>
                         <option disabled>──────────</option>
                         <optgroup label="🌏 亚洲 / Asia">
-                            <option value="HK">HK - 香港 (HongKong)</option>
-                            <option value="TW">TW - 台湾 (Taiwan)</option>
-                            <option value="KR">KR - 韩国 (Korea)</option>
-                            <option value="JP">JP - 日本 (Japan)</option>
-                            <option value="SG">SG - 新加坡 (Singapore)</option>
+                            <option value="HK">🇭🇰 香港 (HongKong)</option>
+                            <option value="TW">🇹🇼 台湾 (Taiwan)</option>
+                            <option value="KR">🇰🇷 韩国 (Korea)</option>
+                            <option value="JP">🇯🇵 日本 (Japan)</option>
+                            <option value="SG">🇸🇬 新加坡 (Singapore)</option>
                         </optgroup>
                         <optgroup label="🌎 北美 / North America">
-                            <option value="US">US - 美国 (United States)</option>
-                            <option value="CA">CA - 加拿大 (Canada)</option>
+                            <option value="US">🇺🇸 美国 (United States)</option>
+                            <option value="CA">🇨🇦 加拿大 (Canada)</option>
                         </optgroup>
                         <optgroup label="🌍 欧洲 / Europe">
-                            <option value="GB">GB - 英国 (United Kingdom)</option>
-                            <option value="DE">DE - 德国 (Germany)</option>
-                            <option value="FR">FR - 法国 (France)</option>
+                            <option value="GB">🇬🇧 英国 (United Kingdom)</option>
+                            <option value="DE">🇩🇪 德国 (Germany)</option>
+                            <option value="FR">🇫🇷 法国 (France)</option>
                         </optgroup>
                         <optgroup label="🌏 大洋洲 / Oceania">
-                            <option value="AU">AU - 澳大利亚 (Australia)</option>
+                            <option value="AU">🇦🇺 澳大利亚 (Australia)</option>
                         </optgroup>
                     </select>
                 </div>
             </div>
 
-            <div class="form-group" id="customRegionInputGroup" style="display: none;">
+            <div class="form-group" id="customRegionInputGroup">
                 <label for="customRegionInput">⌨️ 输入国家代码</label>
                 <div class="input-wrapper">
                     <input type="text" id="customRegionInput" placeholder="请输入两位字母代码，例如: US" maxlength="2"
-                        style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase();">
+                        style="text-transform: uppercase;" disabled oninput="this.value = this.value.toUpperCase();">
                 </div>
             </div>
 
@@ -11337,19 +11337,23 @@ vless://7b102311-43fd-4e8f-977e-8090623c101d@edt-pages.github.io:443?security=tl
             onProxyRegionChange();
         }
 
-        function closeGetMoreProxyIPModal(event) {
-            if (event && event.target !== event.currentTarget) return;
+        function closeGetMoreProxyIPModal() {
             document.getElementById('getMoreProxyIPModal').classList.remove('show');
         }
 
         function onProxyRegionChange() {
             const select = document.getElementById('proxyRegionSelect');
-            const customGroup = document.getElementById('customRegionInputGroup');
+            const customInput = document.getElementById('customRegionInput');
 
             if (select.value === 'custom') {
-                customGroup.style.display = 'block';
+                // 自定义模式：启用输入
+                customInput.value = '';
+                customInput.disabled = false;
+                customInput.focus();
             } else {
-                customGroup.style.display = 'none';
+                // 预选地区模式：禁用输入，自动填充地区代码
+                customInput.value = select.value;
+                customInput.disabled = true;
             }
         }
 
